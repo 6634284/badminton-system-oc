@@ -1,0 +1,74 @@
+.my-page {
+  padding: 24px;
+}
+
+.user-card {
+  display: flex;
+  align-items: center;
+  padding: 32px;
+}
+
+.avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: #1890ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 24px;
+}
+
+.avatar-text {
+  font-size: 48px;
+  color: #fff;
+}
+
+.user-info {
+  flex: 1;
+}
+
+.nickname {
+  font-size: 32px;
+  font-weight: bold;
+  color: #333;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.member-no {
+  font-size: 24px;
+  color: #999;
+}
+
+.menu-section {
+  margin-top: 24px;
+  padding: 0;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  padding: 24px 32px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.menu-item:last-child {
+  border-bottom: none;
+}
+
+.menu-icon {
+  font-size: 36px;
+  margin-right: 16px;
+}
+
+.menu-text {
+  flex: 1;
+  font-size: 28px;
+  color: #333;
+}
+
+.menu-arrow {
+  font-size: 32px;
+  color: #999;
+}

@@ -1,0 +1,15 @@
+// apps/client-api/test/jest-e2e.json
+{
+  "moduleFileExtensions": ["js", "json", "ts"],
+  "rootDir": ".",
+  "testEnvironment": "node",
+  "testRegex": ".e2e-spec.ts$",
+  "transform": {
+    "^.+\\.(t|j)s$": "ts-jest"
+  },
+  "moduleNameMapper": {
+    "^@app/modules(|/.*)$": "<rootDir>/../../libs/modules/src$1",
+    "^@app/infra(|/.*)$": "<rootDir>/../../libs/infra/src$1",
+    "^@app/shared(|/.*)$": "<rootDir>/../../libs/shared/src$1"
+  }
+}

@@ -1,0 +1,85 @@
+.activity-list-page {
+  padding: 24px;
+}
+
+.header {
+  margin-bottom: 32px;
+}
+
+.title {
+  font-size: 40px;
+  font-weight: bold;
+  color: #333;
+}
+
+.loading {
+  text-align: center;
+  color: #999;
+  padding: 40px;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.activity-card {
+  padding: 24px;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.activity-title {
+  font-size: 30px;
+  font-weight: bold;
+  color: #333;
+}
+
+.status {
+  font-size: 24px;
+  padding: 4px 12px;
+  border-radius: 4px;
+}
+
+.status-registering {
+  background: #e6f7ff;
+  color: #1890ff;
+}
+
+.status-full {
+  background: #fff7e6;
+  color: #fa8c16;
+}
+
+.status-finished {
+  background: #f6f6f6;
+  color: #999;
+}
+
+.card-body {
+  margin-bottom: 16px;
+}
+
+.info {
+  font-size: 24px;
+  color: #666;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.card-footer {
+  border-top: 1px solid #f0f0f0;
+  padding-top: 16px;
+}
+
+.price {
+  font-size: 32px;
+  color: #ff4d4f;
+  font-weight: bold;
+}

@@ -1,0 +1,191 @@
+# docker-compose.prod.yml
+
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: badminton-postgres-prod
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-badminton}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-badminton}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-badminton}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: badminton-redis-prod
+    restart: always
+    ports:
+      - "6379:6379"
+    command: redis-server --requirepass ${REDIS_PASSWORD}
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  client-api:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: badminton-client-api-prod
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-badminton}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-badminton}?schema=public
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      NODE_ENV: production
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  admin-api:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+      args:
+        APP_NAME: admin-api
+    container_name: badminton-admin-api-prod
+    restart: always
+    ports:
+      - "3001:3001"
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-badminton}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-badminton}?schema=public
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      NODE_ENV: production
+      ADMIN_PORT: 3001
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  nginx:
+    image: nginx:alpine
+    container_name: badminton-nginx-prod
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/ssl:/etc/nginx/ssl
+    depends_on:
+      - client-api
+      - admin-api
+      - open-api
+
+  open-api:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+      args:
+        APP_NAME: open-api
+    container_name: badminton-open-api-prod
+    restart: always
+    ports:
+      - "3002:3002"
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-badminton}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-badminton}?schema=public
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      NODE_ENV: production
+      OPEN_PORT: 3002
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  worker:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+      args:
+        APP_NAME: worker
+    container_name: badminton-worker-prod
+    restart: always
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-badminton}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-badminton}?schema=public
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      NODE_ENV: production
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  scheduler:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+      args:
+        APP_NAME: scheduler
+    container_name: badminton-scheduler-prod
+    restart: always
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-badminton}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-badminton}?schema=public
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      NODE_ENV: production
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  ws-gateway:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+      args:
+        APP_NAME: ws-gateway
+    container_name: badminton-ws-gateway-prod
+    restart: always
+    ports:
+      - "3003:3003"
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-badminton}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-badminton}?schema=public
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      NODE_ENV: production
+      WS_PORT: 3003
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
+  redis_data:

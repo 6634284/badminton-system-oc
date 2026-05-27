@@ -1,0 +1,127 @@
+.wallet-page {
+  padding: 24px;
+}
+
+.balance-card {
+  background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%);
+  color: #fff;
+  padding: 40px 32px;
+  border-radius: 16px;
+}
+
+.balance-label {
+  font-size: 28px;
+  opacity: 0.8;
+  display: block;
+  margin-bottom: 16px;
+}
+
+.balance-value {
+  font-size: 56px;
+  font-weight: bold;
+  display: block;
+  margin-bottom: 32px;
+}
+
+.balance-detail {
+  display: flex;
+  gap: 48px;
+}
+
+.balance-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.item-label {
+  font-size: 24px;
+  opacity: 0.8;
+  margin-bottom: 8px;
+}
+
+.item-value {
+  font-size: 32px;
+  font-weight: bold;
+}
+
+.actions {
+  margin-top: 24px;
+  padding: 24px;
+}
+
+.action-btn {
+  background: #1890ff;
+  color: #fff;
+  padding: 24px;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.btn-text {
+  font-size: 32px;
+  font-weight: bold;
+}
+
+.section {
+  margin-top: 32px;
+}
+
+.section-title {
+  font-size: 30px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 16px;
+}
+
+.transaction-list {
+  background: #fff;
+  border-radius: 16px;
+  padding: 24px;
+}
+
+.empty {
+  text-align: center;
+  color: #999;
+  padding: 40px;
+}
+
+.transaction-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.transaction-item:last-child {
+  border-bottom: none;
+}
+
+.transaction-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.transaction-type {
+  font-size: 28px;
+  color: #333;
+  margin-bottom: 4px;
+}
+
+.transaction-remark {
+  font-size: 24px;
+  color: #999;
+}
+
+.transaction-amount {
+  font-size: 32px;
+  font-weight: bold;
+}
+
+.transaction-amount.income {
+  color: #52c41a;
+}
+
+.transaction-amount.expense {
+  color: #ff4d4f;
+}
