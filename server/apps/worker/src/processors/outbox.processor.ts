@@ -122,19 +122,107 @@ export class OutboxProcessor extends WorkerHost {
 
     switch (event.eventType) {
       case 'activity.registered':
-        // 处理活动报名事件
-        this.logger.log(`Processing activity.registered event: ${event.id}`);
-        break;
+        return this.handleActivityRegistered(payload);
       case 'activity.canceled':
-        // 处理活动取消事件
-        this.logger.log(`Processing activity.canceled event: ${event.id}`);
-        break;
+        return this.handleActivityCanceled(payload);
       case 'payment.completed':
-        // 处理支付完成事件
-        this.logger.log(`Processing payment.completed event: ${event.id}`);
-        break;
+        return this.handlePaymentCompleted(payload);
+      case 'payment.refunded':
+        return this.handlePaymentRefunded(payload);
+      case 'member.joined':
+        return this.handleMemberJoined(payload);
+      case 'order.created':
+        return this.handleOrderCreated(payload);
       default:
         this.logger.warn(`Unknown event type: ${event.eventType}`);
     }
+  }
+
+  private async handleActivityRegistered(payload: any) {
+    this.logger.log(`[Event] Activity registered: ${payload.activityId}`);
+
+    await this.queueService.addJob('notification', 'send-wechat', {
+      userId: payload.userId,
+      templateId: 'activity_registered',
+      data: {
+        activity_title: payload.activityTitle,
+        activity_time: payload.activityTime,
+        venue_name: payload.venueName,
+      },
+    });
+  }
+
+  private async handleActivityCanceled(payload: any) {
+    this.logger.log(`[Event] Activity canceled: ${payload.activityId}`);
+
+    const registrations = await this.prisma.activityRegistration.findMany({
+      where: {
+        activityId: payload.activityId,
+        status: 'canceled',
+      },
+    });
+
+    for (const reg of registrations) {
+      await this.queueService.addJob('notification', 'send-wechat', {
+        userId: Number(reg.userId),
+        templateId: 'activity_canceled',
+        data: {
+          activity_title: payload.activityTitle,
+          reason: payload.reason,
+        },
+      });
+    }
+  }
+
+  private async handlePaymentCompleted(payload: any) {
+    this.logger.log(`[Event] Payment completed: ${payload.paymentId}`);
+
+    if (payload.bizType === 'recharge') {
+      await this.queueService.addJob('notification', 'send-wechat', {
+        userId: payload.userId,
+        templateId: 'recharge_success',
+        data: {
+          amount: String(payload.amount),
+          balance: String(payload.balance),
+        },
+      });
+    }
+  }
+
+  private async handlePaymentRefunded(payload: any) {
+    this.logger.log(`[Event] Payment refunded: ${payload.refundId}`);
+
+    await this.queueService.addJob('notification', 'send-wechat', {
+      userId: payload.userId,
+      templateId: 'refund_success',
+      data: {
+        amount: String(payload.amount),
+      },
+    });
+  }
+
+  private async handleMemberJoined(payload: any) {
+    this.logger.log(`[Event] Member joined: ${payload.userId}`);
+
+    await this.queueService.addJob('notification', 'send-wechat', {
+      userId: payload.userId,
+      templateId: 'welcome',
+      data: {
+        tenant_name: payload.tenantName,
+      },
+    });
+  }
+
+  private async handleOrderCreated(payload: any) {
+    this.logger.log(`[Event] Order created: ${payload.orderNo}`);
+
+    await this.queueService.addJob('notification', 'send-wechat', {
+      userId: payload.userId,
+      templateId: 'order_created',
+      data: {
+        order_no: payload.orderNo,
+        amount: String(payload.amount),
+      },
+    });
   }
 }
